@@ -1,0 +1,17 @@
+{
+  "short_name": "Prathamesh",
+  "name": "Prathamesh Atul Kadam",
+  "description": "Personal Portfolio & Resume of Prathamesh Atul Kadam.",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "type": "image/x-icon",
+      "sizes": "32x32",
+      "purpose": "any"
+    }
+  ],
+  "id": "/?utm_source=pwa",
+  "start_url": "/?utm_source=pwa",
+  "display": "standalone",
+  "scope": "/"
+}
