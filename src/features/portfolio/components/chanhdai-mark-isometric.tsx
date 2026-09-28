@@ -11,8 +11,8 @@ import {
   useTransform,
 } from "motion/react"
 
-import { cn } from "@/lib/utils"
 import { metalClickSound } from "@/lib/soundcn/metal-click"
+import { cn } from "@/lib/utils"
 import { useSound } from "@/hooks/soundcn/use-sound"
 
 const transition: Transition = {
@@ -25,28 +25,31 @@ const transition: Transition = {
 // ---------------------------------------------------------------------
 // Isometric letter geometry generator
 //
-// Each letter is defined as a simple pixel bitmap (1 = filled cell).
-// The generator projects that bitmap onto a true isometric grid,
-// extracts its boundary (outer silhouette AND any interior holes, e.g.
-// the counter of "P") via a marching-squares-style edge walk, and
-// builds path layers from it: a top face (evenodd fill handles holes
-// automatically), side walls (one quad per boundary edge), and a
-// stroke outline (top rim + bottom rim + corner ticks).
+// Each letter is a pixel bitmap (1 = filled cell), projected onto true
+// 30deg isometric axes: the "col" axis ascends (up-right), the "row"
+// axis descends (down-right). That's what makes a multi-letter mark
+// read as rising from bottom-left toward top-right — a top-down
+// floor-grid projection (both axes moving downward) reads the wrong
+// way, ending bottom-right instead.
 //
-// This replaces hand-authored path coordinates — fragile and easy to
-// get subtly (or completely) wrong — with geometry that is correct by
-// construction for any bitmap you give it. Edit the bitmaps below to
-// change the letterforms; nothing else needs to change.
+// The boundary walk (extractEdges) keeps only edges bordering an empty
+// neighbor, which automatically yields both the outer silhouette and
+// any interior holes (e.g. P's counter) with no extra logic. Side
+// walls are one quad per boundary edge, extruded straight down (world
+// Z always projects to pure vertical, independent of the ground-plane
+// axis convention above).
 // ---------------------------------------------------------------------
 
 const TILE_W = 110.86 // projected width of one grid cell
 const TILE_H = 64 // projected height of one grid cell
+const HALF_W = TILE_W / 2
+const HALF_H = TILE_H / 2
 const EXTRUDE = 32 // vertical "thickness" of the extrusion
 
 type Pt = [number, number]
 
 function project(col: number, row: number): Pt {
-  return [(col - row) * (TILE_W / 2), (col + row) * (TILE_H / 2)]
+  return [(col + row) * HALF_W, (row - col) * HALF_H]
 }
 
 function extractEdges(bitmap: number[][]): [Pt, Pt][] {
@@ -59,10 +62,26 @@ function extractEdges(bitmap: number[][]): [Pt, Pt][] {
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       if (!filled(r, c)) continue
-      if (!filled(r - 1, c)) edges.push([[c, r], [c + 1, r]])
-      if (!filled(r, c + 1)) edges.push([[c + 1, r], [c + 1, r + 1]])
-      if (!filled(r + 1, c)) edges.push([[c + 1, r + 1], [c, r + 1]])
-      if (!filled(r, c - 1)) edges.push([[c, r + 1], [c, r]])
+      if (!filled(r - 1, c))
+        edges.push([
+          [c, r],
+          [c + 1, r],
+        ])
+      if (!filled(r, c + 1))
+        edges.push([
+          [c + 1, r],
+          [c + 1, r + 1],
+        ])
+      if (!filled(r + 1, c))
+        edges.push([
+          [c + 1, r + 1],
+          [c, r + 1],
+        ])
+      if (!filled(r, c - 1))
+        edges.push([
+          [c, r + 1],
+          [c, r],
+        ])
     }
   }
   return edges
@@ -143,31 +162,33 @@ function tickPath(edges: [Pt, Pt][], offsetCol: number): string {
   return d.trim()
 }
 
-// 5x7 blocky bitmaps. 1 = filled. Edit freely — the generator handles
-// any shape, including P's enclosed hole (the counter). Make them
-// chunkier/taller if you want a bolder mark; just keep them roughly
-// the same width so P and K feel balanced side by side.
+// 6x8 bold bitmaps — thicker (2-cell) strokes and tighter letter
+// spacing than a thin 1-cell pixel font, closer to the reference
+// mark's chunky, mostly-solid letterforms. Edit freely — the generator
+// handles any shape, including P's enclosed hole (the counter).
 const P_BITMAP = [
-  [1, 1, 1, 1],
-  [1, 0, 0, 1],
-  [1, 0, 0, 1],
-  [1, 1, 1, 1],
-  [1, 0, 0, 0],
-  [1, 0, 0, 0],
-  [1, 0, 0, 0],
+  [1, 1, 1, 1, 1, 1],
+  [1, 1, 0, 0, 1, 1],
+  [1, 1, 0, 0, 1, 1],
+  [1, 1, 1, 1, 1, 1],
+  [1, 1, 0, 0, 0, 0],
+  [1, 1, 0, 0, 0, 0],
+  [1, 1, 0, 0, 0, 0],
+  [1, 1, 0, 0, 0, 0],
 ]
 
 const K_BITMAP = [
-  [1, 0, 0, 0, 1],
-  [1, 0, 0, 1, 0],
-  [1, 0, 1, 0, 0],
-  [1, 1, 0, 0, 0],
-  [1, 0, 1, 0, 0],
-  [1, 0, 0, 1, 0],
-  [1, 0, 0, 0, 1],
+  [1, 1, 0, 0, 1, 1],
+  [1, 1, 0, 0, 1, 1],
+  [1, 1, 0, 1, 1, 0],
+  [1, 1, 1, 1, 0, 0],
+  [1, 1, 1, 1, 0, 0],
+  [1, 1, 0, 1, 1, 0],
+  [1, 1, 0, 0, 1, 1],
+  [1, 1, 0, 0, 1, 1],
 ]
 
-const K_OFFSET_COL = 5 // P is 4 cols wide + 1 col gap
+const K_OFFSET_COL = 7 // P is 6 cols wide + 1 col gap — tighter than before
 
 function buildLetter(bitmap: number[][], offsetCol: number) {
   const edges = extractEdges(bitmap)
@@ -180,10 +201,12 @@ function buildLetter(bitmap: number[][], offsetCol: number) {
   }
 }
 
-// Computed once at module load — this is static geometry, no need to
-// recompute per render.
 const P_GEO = buildLetter(P_BITMAP, 0)
 const K_GEO = buildLetter(K_BITMAP, K_OFFSET_COL)
+
+function centroid(bitmap: number[][], offsetCol: number): Pt {
+  return project(offsetCol + bitmap[0].length / 2, bitmap.length / 2)
+}
 
 function computeBounds() {
   const sources: [number[][], number][] = [
@@ -207,7 +230,7 @@ function computeBounds() {
     }
   }
 
-  const margin = 24
+  const margin = 32
   return {
     x: minX - margin,
     y: minY - margin,
@@ -217,6 +240,36 @@ function computeBounds() {
 }
 
 const BOUNDS = computeBounds()
+const P_CENTER = centroid(P_BITMAP, 0)
+const K_CENTER = centroid(K_BITMAP, K_OFFSET_COL)
+const MID_CENTER: Pt = [
+  (P_CENTER[0] + K_CENTER[0]) / 2,
+  (P_CENTER[1] + K_CENTER[1]) / 2,
+]
+
+// Dashed background axis guide lines — matching the original mark's
+// faint x/y isometric axis indicators, along the same two true-30deg
+// directions used by project() above. These deliberately extend WAY
+// beyond the mark's own bounding box — combined with the svg's
+// overflow-visible, they bleed into the surrounding banner/container
+// rather than stopping at the letters' edges, matching the original.
+const ASCEND_DIR: Pt = [HALF_W / TILE_H, -HALF_H / TILE_H]
+const DESCEND_DIR: Pt = [HALF_W / TILE_H, HALF_H / TILE_H]
+const GUIDE_LEN = Math.max(BOUNDS.width, BOUNDS.height) * 6
+
+function axisLine(center: Pt, dir: Pt, length: number): string {
+  const x1 = center[0] - dir[0] * length
+  const y1 = center[1] - dir[1] * length
+  const x2 = center[0] + dir[0] * length
+  const y2 = center[1] + dir[1] * length
+  return `M${fmt(x1)} ${fmt(y1)} L${fmt(x2)} ${fmt(y2)}`
+}
+
+const GUIDE_LINES = [
+  axisLine(MID_CENTER, ASCEND_DIR, GUIDE_LEN),
+  axisLine(P_CENTER, DESCEND_DIR, GUIDE_LEN),
+  axisLine(K_CENTER, DESCEND_DIR, GUIDE_LEN),
+]
 
 export function ChanhDaiMarkIsometric({ className }: { className?: string }) {
   const id = useId()
@@ -259,7 +312,7 @@ export function ChanhDaiMarkIsometric({ className }: { className?: string }) {
     <motion.svg
       ref={ref}
       className={cn(
-        "h-auto w-full touch-manipulation overflow-visible select-none [--pattern:color-mix(in_oklab,var(--foreground)_12%,var(--background))] [--stroke:color-mix(in_oklab,var(--foreground)_16%,var(--background))]",
+        "h-auto w-full touch-manipulation overflow-visible select-none [--axis:color-mix(in_oklab,var(--foreground)_8%,var(--background))] [--pattern:color-mix(in_oklab,var(--foreground)_12%,var(--background))] [--stroke:color-mix(in_oklab,var(--foreground)_16%,var(--background))]",
         className
       )}
       viewBox={`${BOUNDS.x} ${BOUNDS.y} ${BOUNDS.width} ${BOUNDS.height}`}
@@ -305,6 +358,17 @@ export function ChanhDaiMarkIsometric({ className }: { className?: string }) {
           />
         </motion.radialGradient>
       </defs>
+
+      {/* Background axis guide lines — decorative, drawn first so
+          everything else paints over them. Deliberately unclipped: they
+          extend far beyond the letters and rely on overflow-visible
+          (plus the parent container not clipping) to bleed into the
+          wider banner, matching the reference mark. */}
+      <g stroke="var(--axis)" strokeWidth="1" strokeDasharray="4 2">
+        {GUIDE_LINES.map((d, i) => (
+          <path key={i} d={d} />
+        ))}
+      </g>
 
       {/* Static walls + bottom rim + corner ticks. These never move —
           see the note on the top-face group below for why that's fine. */}

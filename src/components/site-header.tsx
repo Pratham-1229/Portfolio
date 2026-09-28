@@ -1,9 +1,8 @@
 import dynamic from "next/dynamic"
-import Link from "next/link"
 
 import { MAIN_NAV } from "@/config/site"
 import { Separator } from "@/components/ui/separator"
-import { ChanhDaiMark } from "@/components/chanhdai-mark"
+import { HeaderLogo } from "@/components/header-logo"
 import { NavDesktop } from "@/components/nav-desktop"
 import { NavItemGitHub } from "@/components/nav-item-github"
 import { ThemeToggle } from "@/components/theme-toggle"
@@ -14,9 +13,7 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 max-w-screen overflow-x-clip bg-background px-2">
       <div className="screen-line-top screen-line-bottom mx-auto flex h-(--header-height) items-center gap-2 border-x screen-line-bottom-border screen-line-top-border pr-2 pl-4 after:z-1 sm:gap-4 md:max-w-3xl">
-        <Link href="/" aria-label="Home">
-          <ChanhDaiMark className="h-6 shrink-0" />
-        </Link>
+        <HeaderLogo />
 
         <div className="flex-1" />
 
