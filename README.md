@@ -115,6 +115,4 @@ The easiest way to deploy this portfolio is using [Vercel](https://vercel.com):
 
 ## 📄 License & Attribution
 
-This project is open-source under the [MIT License](./LICENSE).
-
 Built upon the portfolio template by [Nguyễn Chánh Đại](https://github.com/ncdai/chanhdai.com), customized and personalized with original branding, content, and geometry for **Prathamesh Kadam**.
