@@ -1,13 +1,12 @@
+import Link from "next/link"
+
 import { SOURCE_CODE_GITHUB_URL } from "@/config/site"
 import { cn } from "@/lib/utils"
-import { GitHubIcon, LinkedInIcon, XIcon } from "@/components/icons"
+import { SiteFooterInteractiveLogotype } from "@/components/site-footer-brand"
 import { SOCIAL } from "@/features/portfolio/data/social-links"
 import { USER } from "@/features/portfolio/data/user"
 
 export function SiteFooter() {
-  const githubLink = SOCIAL.github
-  const linkedinLink = SOCIAL.linkedin
-
   return (
     <footer className="max-w-screen overflow-x-clip px-2">
       <div className="mx-auto border-x border-line md:max-w-3xl">
@@ -15,82 +14,141 @@ export function SiteFooter() {
           <div className="stripe-divider h-12" />
         </div>
 
-        <dl className="flex flex-col gap-4 py-8 font-mono [&_dd]:text-sm [&_dt]:text-right [&_dt]:text-sm [&_dt]:text-muted-foreground">
-          <Item>
-            <dt>Built by</dt>
-            <dd>{USER.displayName}</dd>
-          </Item>
+        <div className="flex flex-col gap-3 px-4 py-8 font-mono text-sm text-muted-foreground">
+          <p>
+            Inspired by{" "}
+            <a
+              className="text-foreground link-underline"
+              href="https://chanhdai.com"
+              target="_blank"
+              rel="noopener"
+            >
+              chanhdai.com
+            </a>
+            {" / "}
+            <a
+              className="text-foreground link-underline"
+              href="https://tailwindcss.com"
+              target="_blank"
+              rel="noopener"
+            >
+              tailwindcss.com
+            </a>
+            {" / "}
+            <a
+              className="text-foreground link-underline"
+              href="https://ui.shadcn.com"
+              target="_blank"
+              rel="noopener"
+            >
+              ui.shadcn.com
+            </a>
+            {" / "}
+            <a
+              className="text-foreground link-underline"
+              href="https://vercel.com"
+              target="_blank"
+              rel="noopener"
+            >
+              vercel.com
+            </a>
+          </p>
 
-          <Item>
-            <dt>Source code</dt>
-            <dd>
-              <a
-                className="link-underline"
-                href={SOURCE_CODE_GITHUB_URL}
-                target="_blank"
-                rel="noopener"
-              >
-                GitHub
-              </a>
-            </dd>
-          </Item>
+          <p>
+            Built by <span className="text-foreground">{USER.displayName}</span>
+            . Focused on scalable web apps, clean systems, and purposeful
+            design.
+          </p>
 
-          <Item>
-            <dt>Based on</dt>
-            <dd>
-              <a
-                className="link-underline"
-                href="https://github.com/ncdai/chanhdai.com"
-                target="_blank"
-                rel="noopener"
-              >
-                chanhdai.com
-              </a>
-            </dd>
-          </Item>
-        </dl>
+          <p>
+            © 2026 {USER.displayName}. View the source on{" "}
+            <a
+              className="text-foreground link-underline"
+              href={SOURCE_CODE_GITHUB_URL}
+              target="_blank"
+              rel="noopener"
+            >
+              GitHub
+            </a>
+            .
+          </p>
+        </div>
 
         <div className="screen-line-top screen-line-bottom flex w-full before:z-1 after:z-1">
-          <div className="mx-auto flex items-center justify-center gap-3 border-x border-line bg-background px-4">
+          <div className="mx-auto flex flex-wrap items-center justify-center gap-3 border-x border-line bg-background px-4 py-3 font-mono text-xs text-muted-foreground">
+            <Link
+              className="transition-[color] hover:text-foreground"
+              href="/llms.txt"
+              target="_blank"
+            >
+              llms.txt
+            </Link>
+
+            <Separator />
+
+            <a
+              className="transition-[color] hover:text-foreground"
+              href={SOCIAL.resume.href}
+              target="_blank"
+              rel="noopener"
+            >
+              Resume
+            </a>
+
             {SOCIAL.x && (
               <>
+                <Separator />
                 <a
-                  className="flex items-center text-muted-foreground transition-[color] hover:text-foreground"
+                  className="transition-[color] hover:text-foreground"
                   href={SOCIAL.x.href}
                   target="_blank"
                   rel="noopener"
-                  aria-label="X Profile"
                 >
-                  <XIcon className="size-4" />
+                  X
                 </a>
-                <Separator />
               </>
             )}
 
+            <Separator />
+
             <a
-              className="flex items-center text-muted-foreground transition-[color] hover:text-foreground"
-              href={githubLink.href}
+              className="transition-[color] hover:text-foreground"
+              href={SOCIAL.github.href}
               target="_blank"
               rel="noopener"
-              aria-label="GitHub Profile"
             >
-              <GitHubIcon className="size-4" />
+              GitHub
             </a>
 
             <Separator />
 
             <a
-              className="flex items-center text-muted-foreground transition-[color] hover:text-foreground"
-              href={linkedinLink.href}
+              className="transition-[color] hover:text-foreground"
+              href={SOCIAL.linkedin.href}
               target="_blank"
               rel="noopener"
-              aria-label="LinkedIn Profile"
             >
-              <LinkedInIcon className="size-4" />
+              LinkedIn
             </a>
+
+            {SOCIAL.instagram && (
+              <>
+                <Separator />
+                <a
+                  className="transition-[color] hover:text-foreground"
+                  href={SOCIAL.instagram.href}
+                  target="_blank"
+                  rel="noopener"
+                >
+                  Instagram
+                </a>
+              </>
+            )}
           </div>
         </div>
       </div>
+
+      <SiteFooterInteractiveLogotype />
 
       <div className="h-(--fade-bottom-height)" />
       <div className="pb-[env(safe-area-inset-bottom,0)]" />
@@ -99,9 +157,5 @@ export function SiteFooter() {
 }
 
 function Separator({ className, ...props }: React.ComponentProps<"div">) {
-  return <div className={cn("flex h-11 w-px bg-line", className)} {...props} />
-}
-
-function Item({ className, ...props }: React.ComponentProps<"div">) {
-  return <div className={cn("grid grid-cols-2 gap-4", className)} {...props} />
+  return <div className={cn("h-3 w-px bg-line", className)} {...props} />
 }

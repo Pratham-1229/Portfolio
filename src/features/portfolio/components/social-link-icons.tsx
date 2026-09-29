@@ -1,4 +1,4 @@
-import { MailIcon } from "lucide-react"
+import { FileTextIcon, MailIcon } from "lucide-react"
 
 import {
   GitHubIcon,
@@ -18,5 +18,6 @@ export const SOCIAL_ICONS: Record<SocialName, React.JSX.Element> = {
   linkedin: <LinkedInIcon />,
   x: <XIcon />,
   instagram: <InstagramIcon className="size-4" />,
+  resume: <FileTextIcon className="size-4" />,
   email: <MailIcon className="size-4" />,
 }

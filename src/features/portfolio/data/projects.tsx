@@ -5,7 +5,8 @@ export const PROJECTS: Project[] = [
     id: "gekko-compiler",
     title: "Gekko — C++ Compiler",
     period: {
-      start: "09.2026",
+      start: "08.2026",
+      end: "09.2026",
     },
     skills: ["C++", "x86-64", "NASM", "Linux", "GitHub Actions"],
     description: `A compiler written in C++ that translates a custom C-style language into x86-64 assembly, assembled with NASM and linked with ld into standalone Linux ELF64 executables.

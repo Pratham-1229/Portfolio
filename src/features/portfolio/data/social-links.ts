@@ -30,6 +30,11 @@ export const SOCIAL = {
     href: "https://instagram.com/prathamesh_1229",
     sameAs: true,
   },
+  resume: {
+    title: "Resume",
+    handle: "Resume",
+    href: "/resume.pdf",
+  },
   email: {
     title: "Email",
     handle: "prathameshk2905@gmail.com",
