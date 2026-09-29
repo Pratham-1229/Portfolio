@@ -312,7 +312,7 @@ export function ChanhDaiMarkIsometric({ className }: { className?: string }) {
     <motion.svg
       ref={ref}
       className={cn(
-        "h-auto w-full touch-manipulation overflow-visible select-none [--axis:color-mix(in_oklab,var(--foreground)_8%,var(--background))] [--pattern:color-mix(in_oklab,var(--foreground)_12%,var(--background))] [--stroke:color-mix(in_oklab,var(--foreground)_16%,var(--background))]",
+        "h-auto w-full touch-manipulation overflow-visible select-none [--axis:color-mix(in_oklab,var(--foreground)_24%,var(--background))] [--pattern:color-mix(in_oklab,var(--foreground)_12%,var(--background))] [--stroke:color-mix(in_oklab,var(--foreground)_16%,var(--background))]",
         className
       )}
       viewBox={`${BOUNDS.x} ${BOUNDS.y} ${BOUNDS.width} ${BOUNDS.height}`}
